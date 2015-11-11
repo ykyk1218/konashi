@@ -7,19 +7,151 @@
 //
 
 import UIKit
+import CoreBluetooth
+import CoreLocation
+import AudioToolbox
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDelegate, CLLocationManagerDelegate {
+    var centralManager: CBCentralManager!
+    var peripheral: CBPeripheral!
+    var settingCharacteristic: CBCharacteristic!
+    var outputCharacteristic: CBCharacteristic!
+    
+    var locationManager: CLLocationManager!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        self.centralManager = CBCentralManager(delegate: self, queue: nil)
+        self.locationManager = CLLocationManager()
+        self.locationManager.delegate = self
+        self.locationManager.startUpdatingHeading()
+
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
 
+    func centralManagerDidUpdateState(central: CBCentralManager) {
+        //CentralManagerの状態変化を取得
+        print("state: \(central.state)")
+        
+        switch (central.state) {
+        case CBCentralManagerState.PoweredOn:
+                self.centralManager.scanForPeripheralsWithServices(nil, options: nil)
+        default:
+                break
+
+        }
+        
+    }
+    
+    
+    func centralManager(central: CBCentralManager, didDiscoverPeripheral peripheral: CBPeripheral, advertisementData: [String : AnyObject], RSSI: NSNumber) {
+        //周辺デバイスが見つかると呼ばれる
+        print("発見したBLEデバイス： \(peripheral)")
+        
+        self.peripheral = peripheral
+        self.centralManager.connectPeripheral(self.peripheral, options: nil)
+    }
+    
+    func centralManager(central: CBCentralManager, didConnectPeripheral peripheral: CBPeripheral) {
+        //周辺デバイスに接続したときに呼ばれる
+        print("接続成功！")
+        
+        self.peripheral.delegate = self
+        peripheral.readRSSI()
+        peripheral.discoverServices(nil)
+        
+        
+    }
+    
+    func centralManager(central: CBCentralManager, didFailToConnectPeripheral peripheral: CBPeripheral, error: NSError?) {
+        //接続が失敗した時に呼ばれる
+        print("接続失敗")
+    }
+    
+    
+    func peripheral(peripheral: CBPeripheral, didDiscoverServices error: NSError?) {
+        //接続したペリフェラルからサービスが見つかった時に呼ばれる
+        let services: NSArray = peripheral.services!
+        print("\(services.count)個のサービスを発見！\(services)")
+        
+        for obj in services {
+            if let service  = obj as? CBService {
+                //キャラクタリスティックを探索開始
+                peripheral.discoverCharacteristics(nil, forService: service)
+            }
+        }
+    }
+    
+    func peripheral(peripheral: CBPeripheral, didDiscoverCharacteristicsForService service: CBService, error: NSError?) {
+        // キャラクタリスティックが見つかった時に呼ばれる
+        let characteristics: NSArray = service.characteristics!
+        print("\(characteristics.count)個のキャラクタリスティックを発見！")
+        
+        //書き込むデータ
+        var value: CUnsignedChar = 0x01 << 1
+        let data:NSData = NSData(bytes: &value, length: 1)
+        
+        for obj in characteristics {
+            if let characteristic = obj as? CBCharacteristic {
+                
+                if characteristic.UUID.isEqual(CBUUID(string: "3000")) {
+                    self.settingCharacteristic = characteristic
+                    self.peripheral.writeValue(data, forCharacteristic: self.settingCharacteristic, type: CBCharacteristicWriteType.WithoutResponse)
+                    
+                }else if characteristic.UUID.isEqual(CBUUID(string: "3002")) {
+                    self.outputCharacteristic = characteristic
+                    self.peripheral.writeValue(data, forCharacteristic: self.outputCharacteristic, type: CBCharacteristicWriteType.WithoutResponse)
+
+                }
+                /*
+                if characteristic.properties == CBCharacteristicProperties.Read {
+                    //読み出し可能なプロパティのみを取り出す
+                    peripheral.readValueForCharacteristic(characteristic)
+                }else if characteristic.properties == CBCharacteristicProperties.Write {
+                    //書き込み可能なプロパティのみを取り出す
+                    peripheral.writeValue(data, forCharacteristic: characteristic, type: CBCharacteristicWriteType.WithResponse)
+                }
+                */
+            }
+        }
+        
+
+    }
+    
+    
+    func peripheral(peripheral: CBPeripheral, didUpdateValueForCharacteristic characteristic: CBCharacteristic, error: NSError?) {
+        //キャラクタリスティックのvalueを取り出した
+        print("読み出し成功！service uuid: \(characteristic.service.UUID), characteristic uuid \(characteristic.UUID), value: \(characteristic.value)")
+        
+        //if characteristic.UUID.isEqual(<#T##object: AnyObject?##AnyObject?#>)
+    }
+    
+    
+    func peripheral(peripheral: CBPeripheral, didWriteValueForCharacteristic characteristic: CBCharacteristic, error: NSError?) {
+        print("書き込み完了！")
+    }
+    
+    func peripheral(peripheral: CBPeripheral, didReadRSSI RSSI: NSNumber, error: NSError?) {
+        print("RSSI: " + String(RSSI))
+        if Int(RSSI) < -50 {
+            AudioServicesPlaySystemSound(SystemSoundID(kSystemSoundID_Vibrate))
+        }
+        
+    }
+    
+    func locationManager(manager: CLLocationManager, didUpdateHeading newHeading: CLHeading) {
+        //コンパス機能を使って方位を変更すると同時にrssiを取得するようにする
+        if self.peripheral != nil{
+            self.peripheral.readRSSI()
+        }
+
+    }
+    
 
 }
 

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6A0C313A1BF14E8F00EDB804 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A0C31391BF14E8F00EDB804 /* AudioToolbox.framework */; };
 		6A8D40311BEE57E800F24027 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D40301BEE57E800F24027 /* AppDelegate.swift */; };
 		6A8D40331BEE57E800F24027 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D40321BEE57E800F24027 /* ViewController.swift */; };
 		6A8D40361BEE57E800F24027 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A8D40341BEE57E800F24027 /* Main.storyboard */; };
@@ -14,6 +15,7 @@
 		6A8D403B1BEE57E800F24027 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6A8D40391BEE57E800F24027 /* LaunchScreen.storyboard */; };
 		6A8D40461BEE57E800F24027 /* konashiTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D40451BEE57E800F24027 /* konashiTests.swift */; };
 		6A8D40511BEE57E800F24027 /* konashiUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A8D40501BEE57E800F24027 /* konashiUITests.swift */; };
+		6A8D40601BEE5CD200F24027 /* CoreBluetooth.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6A8D405E1BEE5CBE00F24027 /* CoreBluetooth.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,6 +36,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		6A0C31391BF14E8F00EDB804 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
 		6A8D402D1BEE57E800F24027 /* konashi.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = konashi.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A8D40301BEE57E800F24027 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6A8D40321BEE57E800F24027 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -47,6 +50,7 @@
 		6A8D404C1BEE57E800F24027 /* konashiUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = konashiUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6A8D40501BEE57E800F24027 /* konashiUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = konashiUITests.swift; sourceTree = "<group>"; };
 		6A8D40521BEE57E800F24027 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6A8D405E1BEE5CBE00F24027 /* CoreBluetooth.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreBluetooth.framework; path = System/Library/Frameworks/CoreBluetooth.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +58,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6A0C313A1BF14E8F00EDB804 /* AudioToolbox.framework in Frameworks */,
+				6A8D40601BEE5CD200F24027 /* CoreBluetooth.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,6 +87,7 @@
 				6A8D40441BEE57E800F24027 /* konashiTests */,
 				6A8D404F1BEE57E800F24027 /* konashiUITests */,
 				6A8D402E1BEE57E800F24027 /* Products */,
+				6DFE3FB2355F644FC6CA3993 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -123,6 +130,15 @@
 				6A8D40521BEE57E800F24027 /* Info.plist */,
 			);
 			path = konashiUITests;
+			sourceTree = "<group>";
+		};
+		6DFE3FB2355F644FC6CA3993 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				6A0C31391BF14E8F00EDB804 /* AudioToolbox.framework */,
+				6A8D405E1BEE5CBE00F24027 /* CoreBluetooth.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -402,6 +418,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = konashi/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.konashi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -413,6 +430,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = konashi/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.konashi;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -486,6 +504,7 @@
 				6A8D40571BEE57E800F24027 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6A8D40581BEE57E800F24027 /* Build configuration list for PBXNativeTarget "konashiTests" */ = {
 			isa = XCConfigurationList;
@@ -494,6 +513,7 @@
 				6A8D405A1BEE57E800F24027 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		6A8D405B1BEE57E800F24027 /* Build configuration list for PBXNativeTarget "konashiUITests" */ = {
 			isa = XCConfigurationList;
@@ -502,6 +522,7 @@
 				6A8D405D1BEE57E800F24027 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
