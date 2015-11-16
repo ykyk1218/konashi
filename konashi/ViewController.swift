@@ -16,16 +16,45 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     var peripheral: CBPeripheral!
     var settingCharacteristic: CBCharacteristic!
     var outputCharacteristic: CBCharacteristic!
-    
     var locationManager: CLLocationManager!
-
+    
+    let peripheralModel:PeripheralModel = PeripheralModel()
+    
+    let stateLbl:UILabel = UILabel(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width / 2 - 100, 30, 200, 50))
+    let connectBtn:UIButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width / 2 - 100, 80, 200, 50))
+    
+    let advertisBtn:UIButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width / 2 - 100, 130, 200, 50))
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.centralManager = CBCentralManager(delegate: self, queue: nil)
         self.locationManager = CLLocationManager()
         self.locationManager.delegate = self
         self.locationManager.startUpdatingHeading()
-
+        
+        self.stateLbl.text = "未接続"
+        self.connectBtn.setTitle("接続する", forState: UIControlState.Normal)
+        self.connectBtn.addTarget(self, action: "startConnect", forControlEvents: .TouchUpInside)
+        self.connectBtn.backgroundColor = UIColor.redColor()
+        
+        self.advertisBtn.setTitle("アドバタイズする", forState: UIControlState.Normal)
+        self.advertisBtn.addTarget(self.peripheralModel, action: "advertising", forControlEvents: .TouchUpInside)
+        
+        self.view.addSubview(self.stateLbl)
+        self.view.addSubview(self.connectBtn)
+        
+    }
+    
+    func startConnect() {
+        if (self.peripheral != nil) {
+            self.centralManager.connectPeripheral(self.peripheral, options: nil)
+        }
+    }
+    
+    func killConnect() {
+        if (self.peripheral != nil) {
+            self.centralManager.cancelPeripheralConnection(self.peripheral)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -54,23 +83,34 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         print("発見したBLEデバイス： \(peripheral)")
         
         self.peripheral = peripheral
-        self.centralManager.connectPeripheral(self.peripheral, options: nil)
+        
+//        self.centralManager.connectPeripheral(self.peripheral, options: nil)
     }
     
     func centralManager(central: CBCentralManager, didConnectPeripheral peripheral: CBPeripheral) {
         //周辺デバイスに接続したときに呼ばれる
         print("接続成功！")
+        self.stateLbl.text = "接続成功"
         
         self.peripheral.delegate = self
         peripheral.readRSSI()
         peripheral.discoverServices(nil)
         
-        
+        self.connectBtn.addTarget(self, action: "killConnect", forControlEvents: .TouchUpInside)
+        self.connectBtn.setTitle("接続を切る", forState: UIControlState.Normal)
     }
     
     func centralManager(central: CBCentralManager, didFailToConnectPeripheral peripheral: CBPeripheral, error: NSError?) {
         //接続が失敗した時に呼ばれる
         print("接続失敗")
+    }
+    
+    func centralManager(central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: NSError?) {
+        //接続が切れた時に呼ばれる
+        print("接続が切れました")
+        
+        self.connectBtn.setTitle("接続する", forState: UIControlState.Normal)
+        self.connectBtn.addTarget(self, action: "startConnect", forControlEvents: .TouchUpInside)
     }
     
     
