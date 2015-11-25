@@ -21,9 +21,12 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     let peripheralModel:PeripheralModel = PeripheralModel()
     
     let stateLbl:UILabel = UILabel(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width / 2 - 100, 30, 200, 50))
+
     let connectBtn:UIButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width / 2 - 100, 80, 200, 50))
     
-    let advertisBtn:UIButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width / 2 - 100, 130, 200, 50))
+    let advertisBtn:UIButton = UIButton(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width / 2 - 100, 160, 200, 50))
+
+    let scanLbl: UILabel = UILabel(frame: CGRectMake(UIScreen.mainScreen().bounds.size.width / 2 - 100, 250, 200, 50))
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,9 +42,15 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         
         self.advertisBtn.setTitle("アドバタイズする", forState: UIControlState.Normal)
         self.advertisBtn.addTarget(self.peripheralModel, action: "advertising", forControlEvents: .TouchUpInside)
+        self.advertisBtn.backgroundColor = UIColor.redColor()
+        
+        self.scanLbl.text = "スキャン中..."
+        self.scanLbl.sizeToFit()
         
         self.view.addSubview(self.stateLbl)
         self.view.addSubview(self.connectBtn)
+        self.view.addSubview(self.advertisBtn)
+        self.view.addSubview(self.scanLbl)
         
     }
     
@@ -81,10 +90,12 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     func centralManager(central: CBCentralManager, didDiscoverPeripheral peripheral: CBPeripheral, advertisementData: [String : AnyObject], RSSI: NSNumber) {
         //周辺デバイスが見つかると呼ばれる
         print("発見したBLEデバイス： \(peripheral)")
+        self.scanLbl.text = "発見したBLEデバイス：" + peripheral.name!
         
+        //参照を保持するためにstrongプロパティにセットする
+        //そうしないと勝手に解放されて接続が切れる
         self.peripheral = peripheral
-        
-//        self.centralManager.connectPeripheral(self.peripheral, options: nil)
+        self.centralManager.connectPeripheral(self.peripheral, options: nil)
     }
     
     func centralManager(central: CBCentralManager, didConnectPeripheral peripheral: CBPeripheral) {
@@ -92,9 +103,13 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         print("接続成功！")
         self.stateLbl.text = "接続成功"
         
+        //参照を保持するためにstrongプロパティにセットする
+        //そうしないと勝手に解放されて接続が切れる
+        self.peripheral = peripheral
+        
         self.peripheral.delegate = self
-        peripheral.readRSSI()
-        peripheral.discoverServices(nil)
+        self.peripheral.readRSSI()
+        self.peripheral.discoverServices(nil)
         
         self.connectBtn.addTarget(self, action: "killConnect", forControlEvents: .TouchUpInside)
         self.connectBtn.setTitle("接続を切る", forState: UIControlState.Normal)
@@ -108,6 +123,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     func centralManager(central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: NSError?) {
         //接続が切れた時に呼ばれる
         print("接続が切れました")
+        print(error)
         
         self.connectBtn.setTitle("接続する", forState: UIControlState.Normal)
         self.connectBtn.addTarget(self, action: "startConnect", forControlEvents: .TouchUpInside)
@@ -118,6 +134,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         //接続したペリフェラルからサービスが見つかった時に呼ばれる
         let services: NSArray = peripheral.services!
         print("\(services.count)個のサービスを発見！\(services)")
+        self.scanLbl.text = "\(services.count)個のサービスを発見！"
         
         for obj in services {
             if let service  = obj as? CBService {
@@ -132,7 +149,11 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         let characteristics: NSArray = service.characteristics!
         print("\(characteristics.count)個のキャラクタリスティックを発見！")
         
+        let text = self.scanLbl.text
+        self.scanLbl.text = text! + "\n" + "\(characteristics.count)個のキャラクタリスティックを発見！"
+        
         //書き込むデータ
+        /*
         var value: CUnsignedChar = 0x01 << 1
         let data:NSData = NSData(bytes: &value, length: 1)
         
@@ -159,7 +180,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 */
             }
         }
-        
+        */
 
     }
     
